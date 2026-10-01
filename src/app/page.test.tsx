@@ -42,19 +42,24 @@ test("renders semantic Home with four static announcements and temporal warmup",
     screen.getByRole("heading", { level: 1, name: "AFILADOS CLUB" }),
   ).toBeVisible();
   expect(screen.getByRole("status")).toHaveTextContent("PRETEMPORADA");
+  const board = screen.getByLabelText("Datos de la temporada");
   expect(
-    within(screen.getByLabelText("Datos de la temporada")).getByText(
-      "PRETEMPORADA",
-      { exact: true },
-    ),
+    within(board).getByText("PRETEMPORADA", { exact: true }),
   ).toBeVisible();
+  expect(
+    Array.from(board.querySelectorAll("dt"), (term) => term.textContent),
+  ).toEqual(["ESTADO", "APERTURA", "CIERRE", "VENTANA"]);
+  expect(
+    within(board).getByText("APERTURA").nextElementSibling,
+  ).toHaveTextContent(/^28 NOV00:00$/);
+  expect(
+    within(board).getByText("CIERRE").nextElementSibling,
+  ).toHaveTextContent(/^22 DIC00:00$/);
   expect(
     screen.getByRole("progressbar", { name: "NIVEL DE AFILADO" }),
   ).toHaveAttribute("aria-valuenow", "50");
   expect(
-    screen.getByText(
-      "Tiempo de preparación transcurrido. No mide actividad del grupo.",
-    ),
+    screen.getByText("El grupo debería empezar a organizarse."),
   ).toBeVisible();
   const articles = screen.getAllByRole("article");
   expect(articles).toHaveLength(4);
@@ -67,8 +72,9 @@ test("renders semantic Home with four static announcements and temporal warmup",
     expect(
       within(articles[index]).getByRole("heading", { name: title }),
     ).toBeVisible();
-    expect(within(articles[index]).getByText("PRÓXIMAMENTE")).toBeVisible();
   }
+  expect(screen.queryByText("PRÓXIMAMENTE")).not.toBeInTheDocument();
+  expect(screen.getByText("EL PROGRAMA ESTÁ EN PREPARACIÓN.")).toBeVisible();
   expect(screen.queryByRole("link")).not.toBeInTheDocument();
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
   expect(screen.getByRole("contentinfo")).toHaveTextContent(

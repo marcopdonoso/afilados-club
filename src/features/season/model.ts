@@ -61,6 +61,15 @@ export function getWarmupProgress(now: number): number {
   return Math.round(Math.min(1, Math.max(0, elapsed)) * 100);
 }
 
+export function getWarmupCopy(progress: number): string {
+  if (progress <= 15) return "Todavía se permiten excusas.";
+  if (progress <= 40) return "Empieza el calentamiento.";
+  if (progress <= 65) return "El grupo debería empezar a organizarse.";
+  if (progress <= 85) return "Ya no hay vuelta atrás.";
+  if (progress <= 99) return "Afilado crítico.";
+  return "TEMPORADA ABIERTA.";
+}
+
 const dateFormatter = new Intl.DateTimeFormat("es-BO", {
   timeZone: season.timeZone,
   day: "numeric",

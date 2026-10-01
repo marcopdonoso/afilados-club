@@ -75,7 +75,6 @@ export function SeasonHome({ initialNow }: { initialNow: number }) {
                     0{index + 1} /{" "}
                     <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
                   </span>
-                  <span className="coming-soon">PRÓXIMAMENTE</span>
                 </div>
                 <h3>{title}</h3>
                 <p>{copy}</p>

@@ -8,6 +8,7 @@ import {
   getCountdown,
   getPhase,
   getSeasonDay,
+  getWarmupCopy,
   getWarmupProgress,
   phaseLabels,
   season,
@@ -127,14 +128,14 @@ export function SeasonStatus({
           <dt className="technical">APERTURA</dt>
           <dd>
             {seasonDates.opening}
-            <small>00:00 · hora de Bolivia</small>
+            <small>00:00</small>
           </dd>
         </div>
         <div>
           <dt className="technical">CIERRE</dt>
           <dd>
             {seasonDates.closing}
-            <small>00:00 · último día: {seasonDates.lastDay}</small>
+            <small>00:00</small>
           </dd>
         </div>
         <div>
@@ -161,9 +162,7 @@ export function SeasonStatus({
           >
             <div style={{ width: `${progress}%` }} />
           </div>
-          <p>
-            Tiempo de preparación transcurrido. No mide actividad del grupo.
-          </p>
+          <p>{getWarmupCopy(progress)}</p>
         </div>
       )}
     </section>

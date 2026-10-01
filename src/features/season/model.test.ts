@@ -5,6 +5,7 @@ import {
   getCountdown,
   getPhase,
   getSeasonDay,
+  getWarmupCopy,
   getWarmupProgress,
   season,
   seasonDates,
@@ -98,5 +99,23 @@ describe("temporal warmup", () => {
     [season.endsAt, 100],
   ])("at %s is clamped to %s percent", (now, progress) => {
     expect(getWarmupProgress(now)).toBe(progress);
+  });
+});
+
+describe("warmup copy", () => {
+  test.each([
+    [0, "Todavía se permiten excusas."],
+    [15, "Todavía se permiten excusas."],
+    [16, "Empieza el calentamiento."],
+    [40, "Empieza el calentamiento."],
+    [41, "El grupo debería empezar a organizarse."],
+    [65, "El grupo debería empezar a organizarse."],
+    [66, "Ya no hay vuelta atrás."],
+    [85, "Ya no hay vuelta atrás."],
+    [86, "Afilado crítico."],
+    [99, "Afilado crítico."],
+    [100, "TEMPORADA ABIERTA."],
+  ] as const)("at %s percent returns %s", (progress, copy) => {
+    expect(getWarmupCopy(progress)).toBe(copy);
   });
 });

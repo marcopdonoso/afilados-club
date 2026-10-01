@@ -40,9 +40,15 @@ for (const viewport of viewports) {
       /^(PRETEMPORADA|TEMPORADA ABIERTA|TEMPORADA CERRADA)$/,
     );
     await expect(page.getByRole("article")).toHaveCount(4);
+    await expect(
+      page.getByRole("article").getByRole("heading", { level: 3 }),
+    ).toHaveText(["EL AFILADERO", "CALENDARIO", "JUEGOS", "SEASON RECAP"]);
     await expect(page.getByText("PRÓXIMAMENTE", { exact: true })).toHaveCount(
-      4,
+      0,
     );
+    await expect(
+      page.getByText("EL PROGRAMA ESTÁ EN PREPARACIÓN.", { exact: true }),
+    ).toBeVisible();
     await expect(page.locator('meta[name="description"]')).toHaveAttribute(
       "content",
       "La sede de una temporada entre amigos. Cochabamba, 28 de noviembre al 22 de diciembre de 2026. No es un calendario. Es una temporada.",
@@ -100,6 +106,7 @@ test("one build transitions through both phase edges after hydration", async ({
     "aria-valuenow",
     "100",
   );
+  await expect(page.locator(".warmup > p")).toHaveText("TEMPORADA ABIERTA.");
   await page.clock.setFixedTime(new Date("2026-11-28T00:00:00-04:00"));
   await expect(page.getByRole("status")).toHaveText("TEMPORADA ABIERTA");
   await expect(
