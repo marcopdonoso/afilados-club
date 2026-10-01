@@ -1,0 +1,76 @@
+import { season } from "@/features/season/model";
+
+export type EntryError = "access" | "oauth" | "logout";
+const errors = {
+  access: {
+    title: "ESA CUENTA NO ESTÁ EN LA LISTA.",
+    copy: "Esta cuenta no está registrada para entrar a Afilados Club. Usa la cuenta del grupo.",
+  },
+  oauth: {
+    title: "NO SE PUDO COMPLETAR EL ACCESO.",
+    copy: "Vuelve a intentarlo. Si el problema continúa, avisa al grupo.",
+  },
+  logout: {
+    title: "NO SE PUDO CERRAR LA SESIÓN.",
+    copy: "Tu sesión puede seguir abierta. Intenta salir de nuevo.",
+  },
+};
+
+export function ClubEntry({
+  error,
+  hasIdentity = false,
+}: {
+  error?: EntryError;
+  hasIdentity?: boolean;
+}) {
+  const message = error ? errors[error] : null;
+  return (
+    <div className="season-home entry-page">
+      <header className="club-header page-width">
+        <p className="club-wordmark">
+          AFILADOS <span>CLUB</span>
+        </p>
+        <p className="technical">{season.name.toUpperCase()}</p>
+      </header>
+      <main className="entry-main page-width">
+        <section className="entry-card" aria-labelledby="entry-heading">
+          <p className="technical entry-kicker">SOLO PARA EL GRUPO.</p>
+          <h1 id="entry-heading">
+            ACCESO
+            <br />
+            RESTRINGIDO.
+          </h1>
+          <p className="entry-description">
+            La sede de una temporada entre amigos.
+            <br />
+            La entrada es con la cuenta de siempre.
+          </p>
+          {message && (
+            <div className="entry-error" role="alert">
+              <h2 className="technical">{message.title}</h2>
+              <p>{message.copy}</p>
+            </div>
+          )}
+          <a className="google-entry" href="/auth/google">
+            <span aria-hidden="true">G</span>CONTINUAR CON GOOGLE
+          </a>
+          <p className="entry-note">
+            Sin formularios. Sin cuentas nuevas.
+            <br />
+            Solo Google y la lista del club.
+          </p>
+          {hasIdentity && (
+            <form action="/auth/logout" method="post" className="entry-logout">
+              <button className="club-logout" type="submit">
+                SALIR DE ESTA CUENTA
+              </button>
+            </form>
+          )}
+        </section>
+      </main>
+      <footer className="entry-footer page-width technical">
+        AFILADOS CLUB · NO ES UN CALENDARIO. ES UNA TEMPORADA.
+      </footer>
+    </div>
+  );
+}

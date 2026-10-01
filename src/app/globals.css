@@ -97,6 +97,138 @@
   color: var(--quiet);
 }
 
+.club-header:has(.club-identity) {
+  flex-wrap: wrap;
+  padding-block: 18px;
+}
+
+.club-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--quiet);
+}
+
+.club-identity > span {
+  max-width: 180px;
+  overflow-wrap: anywhere;
+}
+
+.club-logout {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  color: var(--foreground);
+  cursor: pointer;
+  font: inherit;
+}
+
+.club-logout:hover {
+  border-color: var(--orange);
+}
+
+.club-logout:focus-visible,
+.google-entry:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 5px;
+}
+
+.entry-page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.entry-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding-block: 56px;
+}
+
+.entry-card {
+  width: min(100%, 600px);
+  margin-inline: auto;
+}
+
+.entry-kicker {
+  color: var(--orange);
+  margin-bottom: 24px;
+}
+
+.entry-card h1 {
+  font-family: var(--font-display), Impact, "Arial Narrow", sans-serif;
+  font-size: clamp(3.4rem, 12vw, 6.5rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 0.94;
+  overflow-wrap: anywhere;
+}
+
+.entry-description {
+  margin-block: 28px 32px;
+  color: var(--quiet);
+  line-height: 1.7;
+}
+
+.google-entry {
+  min-height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--foreground);
+  color: var(--background);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.google-entry > span {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.25rem;
+}
+
+.google-entry:hover {
+  background: var(--orange);
+}
+
+.entry-note {
+  margin-top: 18px;
+  color: var(--quiet);
+  font-size: 0.75rem;
+  line-height: 1.7;
+}
+
+.entry-error {
+  margin-bottom: 24px;
+  padding: 18px;
+  border-left: 3px solid var(--orange);
+  background: var(--surface);
+}
+
+.entry-error h2 {
+  color: var(--orange);
+}
+
+.entry-error p {
+  margin-top: 8px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.entry-logout {
+  margin-top: 24px;
+}
+
+.entry-footer {
+  padding-block: 24px;
+  border-top: 1px solid var(--rule);
+  color: var(--quiet);
+}
+
 .season-stage {
   padding-top: 24px;
 }

@@ -26,7 +26,13 @@ const teasers = [
   },
 ];
 
-export function SeasonHome({ initialNow }: { initialNow: number }) {
+export function SeasonHome({
+  initialNow,
+  member,
+}: {
+  initialNow: number;
+  member?: { display_name: string };
+}) {
   return (
     <div className="season-home">
       <header className="club-header page-width">
@@ -34,6 +40,16 @@ export function SeasonHome({ initialNow }: { initialNow: number }) {
           AFILADOS <span>CLUB</span>
         </p>
         <p className="technical">{season.name.toUpperCase()}</p>
+        {member && (
+          <div className="club-identity technical">
+            <span>{member.display_name}</span>
+            <form action="/auth/logout" method="post">
+              <button className="club-logout" type="submit">
+                SALIR
+              </button>
+            </form>
+          </div>
+        )}
       </header>
 
       <main className="page-width">
