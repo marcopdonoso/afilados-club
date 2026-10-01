@@ -31,8 +31,8 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: #111210;
+  --foreground: #f2efe5;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -49,6 +49,487 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+}
+
+.season-home {
+  --quiet: #b9b8ae;
+  --orange: #ff8a3d;
+  --rule: #40413a;
+  --surface: #1b1c19;
+  background:
+    radial-gradient(ellipse at 85% 15%, #a54c1512, transparent 48%),
+    repeating-linear-gradient(0deg, transparent 0 3px, #ffffff02 3px 4px);
+}
+
+.page-width {
+  width: min(100% - 40px, 1200px);
+  margin-inline: auto;
+}
+
+.technical {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.055em;
+  line-height: 1.6;
+}
+
+.club-header {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.club-wordmark {
+  font-size: 0.875rem;
+  font-weight: 850;
+  letter-spacing: -0.025em;
+}
+
+.club-wordmark span {
+  color: var(--orange);
+}
+
+.club-header > .technical {
+  color: var(--quiet);
+}
+
+.season-stage {
+  padding-top: 24px;
+}
+
+.season-poster {
+  position: relative;
+  padding: 24px 0 28px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.poster-topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: var(--quiet);
+}
+
+.phase-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--orange);
+}
+
+.phase-marker {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  background: currentColor;
+}
+
+.hero-composition {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 82px;
+  column-gap: 20px;
+  row-gap: 20px;
+  margin-block: 34px 32px;
+}
+
+.hero-title {
+  grid-column: 1 / -1;
+}
+
+.location {
+  margin-bottom: 14px;
+  color: var(--quiet);
+}
+
+.hero-title h1,
+.phase-headline,
+.section-heading h2,
+.teaser h3,
+.club-footer > p:first-child {
+  font-family: var(--font-display), Impact, "Arial Narrow", sans-serif;
+  font-weight: 800;
+}
+
+.hero-title h1 {
+  font-size: clamp(5rem, 25vw, 9rem);
+  letter-spacing: -0.025em;
+  line-height: 0.82;
+}
+
+.hero-title h1 span {
+  display: block;
+}
+
+.hero-title h1 span:last-child {
+  color: var(--orange);
+}
+
+.hero-caption {
+  align-self: center;
+  max-width: 370px;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--quiet);
+}
+
+.season-seal {
+  align-self: center;
+  display: grid;
+  justify-items: center;
+  padding-block: 9px;
+  border-block: 1px solid var(--orange);
+  color: var(--orange);
+  text-align: center;
+}
+
+.seal-number {
+  font-family: var(--font-display), Impact, sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.season-seal .technical {
+  font-size: 0.625rem;
+  letter-spacing: 0;
+}
+
+.season-readout {
+  padding-top: 22px;
+  border-top: 1px solid var(--rule);
+}
+
+.readout-label {
+  color: var(--quiet);
+}
+
+.countdown {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.countdown > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+  border-right: 1px solid var(--rule);
+}
+
+.countdown > div:last-child {
+  border-right: 0;
+}
+
+.countdown dt {
+  color: var(--quiet);
+  font-size: 0.6875rem;
+  letter-spacing: 0.025em;
+}
+
+.countdown dd {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: clamp(1.875rem, 8.5vw, 3.5rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.065em;
+  font-variant-numeric: tabular-nums;
+}
+
+.phase-headline {
+  margin-top: 12px;
+  font-size: clamp(2.3rem, 9vw, 4.5rem);
+  line-height: 1.1;
+}
+
+.phase-headline span {
+  color: var(--orange);
+}
+
+.readout-note {
+  margin-top: 8px;
+  color: var(--quiet);
+  font-size: 0.875rem;
+}
+
+.status-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--rule);
+}
+
+.status-board > div {
+  padding: 20px 12px 20px 0;
+}
+
+.status-board > div:nth-child(even) {
+  padding-left: 16px;
+  border-left: 1px solid var(--rule);
+}
+
+.status-board > div:nth-child(-n + 2) {
+  border-bottom: 1px solid var(--rule);
+}
+
+.status-board dt {
+  margin-bottom: 6px;
+  color: var(--quiet);
+}
+
+.status-board dd {
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.status-board .board-state {
+  color: var(--orange);
+}
+
+.status-board small {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--quiet);
+}
+
+.warmup {
+  margin-top: 26px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border-left: 2px solid var(--orange);
+}
+
+.warmup-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.warmup-heading span {
+  color: var(--orange);
+}
+
+.warmup-track {
+  height: 5px;
+  margin-block: 12px;
+  background: var(--rule);
+}
+
+.warmup-track > div {
+  height: 100%;
+  background: var(--orange);
+  transition: width 0.3s ease-out;
+}
+
+.warmup > p {
+  color: var(--quiet);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.next-section {
+  margin-top: 58px;
+}
+
+.section-heading {
+  margin-bottom: 22px;
+}
+
+.section-heading h2 {
+  font-size: 2rem;
+}
+
+.section-heading p {
+  margin-top: 6px;
+  color: var(--quiet);
+}
+
+.teaser-grid {
+  display: grid;
+  border-top: 1px solid var(--rule);
+}
+
+.teaser {
+  position: relative;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.teaser-topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: var(--quiet);
+}
+
+.teaser-index {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coming-soon {
+  padding: 3px 7px;
+  border: 1px solid var(--rule);
+  font-size: 0.6875rem;
+}
+
+.teaser h3 {
+  margin-top: 22px;
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.teaser > p {
+  max-width: 340px;
+  margin-top: 10px;
+  color: var(--quiet);
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+
+.club-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding-block: 54px 28px;
+}
+
+.club-footer > p:first-child {
+  font-size: clamp(1.75rem, 7vw, 3rem);
+  line-height: 1.15;
+}
+
+.club-footer > p:first-child span {
+  color: var(--orange);
+}
+
+.club-footer .technical {
+  color: var(--quiet);
+}
+
+@media (min-width: 700px) {
+  .page-width {
+    width: min(100% - 80px, 1200px);
+  }
+
+  .hero-composition {
+    grid-template-columns: minmax(0, 1fr) 160px;
+    margin-block: 46px 38px;
+  }
+
+  .hero-title {
+    grid-column: 1;
+  }
+
+  .hero-title h1 {
+    font-size: clamp(8rem, 17vw, 13.5rem);
+  }
+
+  .season-seal {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    padding-block: 24px;
+    transform: rotate(-5deg);
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent 0 9px,
+      #ff8a3d0b 9px 10px
+    );
+  }
+
+  .seal-number {
+    font-size: 8rem;
+  }
+
+  .season-seal .technical {
+    font-size: 0.75rem;
+  }
+
+  .hero-caption {
+    font-size: 1rem;
+  }
+
+  .countdown {
+    max-width: 680px;
+    gap: 24px;
+  }
+
+  .teaser-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .teaser {
+    padding: 30px 30px 34px 0;
+  }
+
+  .teaser:nth-child(even) {
+    padding-left: 30px;
+    padding-right: 0;
+    border-left: 1px solid var(--rule);
+  }
+
+  .club-footer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-block: 60px 38px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .season-poster {
+    padding-block: 32px;
+  }
+
+  .hero-composition {
+    grid-template-columns: minmax(0, 1fr) 250px;
+    column-gap: 80px;
+  }
+
+  .seal-number {
+    font-size: 11rem;
+  }
+
+  .status-board {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .status-board > div:nth-child(n) {
+    padding: 24px;
+    border-bottom: 0;
+    border-left: 1px solid var(--rule);
+  }
+
+  .status-board > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .season-home *,
+  .season-home *::before,
+  .season-home *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .dark {

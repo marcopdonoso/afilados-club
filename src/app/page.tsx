@@ -1,12 +1,14 @@
-export default function Home() {
-  return (
-    <main className="flex min-h-svh items-center justify-center p-6">
-      <div className="space-y-3 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          AFILADOS CLUB
-        </h1>
-        <p className="text-muted-foreground">Foundation ready.</p>
-      </div>
-    </main>
-  );
+import { connection } from "next/server";
+
+import { SeasonHome } from "@/features/season/season-home";
+
+async function getRequestTimestamp() {
+  // Request data is read after the prerender boundary, not during JSX composition.
+  await connection();
+  return Date.now();
+}
+
+export default async function Home() {
+  const initialNow = await getRequestTimestamp();
+  return <SeasonHome initialNow={initialNow} />;
 }
