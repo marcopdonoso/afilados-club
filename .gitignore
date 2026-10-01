@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+coverage/
+.vitest/
+playwright-report/
+test-results/
+*.tsbuildinfo
+next-env.d.ts
+.env*
+!.env.example
+.DS_Store
+supabase/.temp/
+supabase/.branches/
+supabase/signing_keys.json
+*.pem
+*.key

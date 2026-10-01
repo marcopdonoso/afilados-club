@@ -1,0 +1,7 @@
+# Only the root package; dependency scripts require deliberate approval.
+allowBuilds:
+  # The platform-native optional package works without this fallback installer.
+  unrs-resolver@1.12.2: false
+savePrefix: ""
+engineStrict: true
+packageManagerStrictVersion: true

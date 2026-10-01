@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+coverage/
+.vitest/
+playwright-report/
+test-results/
+pnpm-lock.yaml
+next-env.d.ts
+supabase/config.toml
+supabase/.temp/
+supabase/.branches/
+.env*
+supabase/signing_keys.json
+*.pem
+*.key
