@@ -9,6 +9,19 @@ import { SeasonHome } from "@/features/season/season-home";
 
 const midpoint = Date.parse("2026-10-30T00:00:00-04:00");
 
+test("member Home adds only display identity and accessible POST logout", () => {
+  render(
+    <SeasonHome initialNow={midpoint} member={{ display_name: "Marco" }} />,
+  );
+  expect(screen.getByRole("banner")).toHaveTextContent("Marco");
+  const button = screen.getByRole("button", { name: "SALIR" });
+  expect(button.closest("form")).toHaveAttribute("action", "/auth/logout");
+  expect(button.closest("form")).toHaveAttribute("method", "post");
+  expect(screen.getAllByRole("article")).toHaveLength(4);
+  expect(screen.queryByText("admin")).not.toBeInTheDocument();
+  expect(screen.queryByRole("img")).not.toBeInTheDocument();
+});
+
 beforeEach(() => {
   vi.useFakeTimers();
   vi.setSystemTime(midpoint);

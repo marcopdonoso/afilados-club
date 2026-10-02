@@ -19,7 +19,7 @@ Season 2026 is scheduled for **November 28–December 22**, in `America/La_Paz`.
 
 WhatsApp remains the main chat. Afilados Club is the season HQ, not another social network. Favor depth, clarity, and a memorable identity over feature volume. Reuse the foundation yearly while keeping seasons distinct and archivable.
 
-Privacy and security are mandatory, not optional polish. Future member data, activity, votes, photos, and scores must be private by default and protected by authorization and Supabase RLS. This bootstrap does not implement those controls or expose such data.
+Privacy and security are mandatory, not optional polish. Block 2 makes the Season Home private with Google-only entry, verified server identity, active membership checks, and own-active-member Supabase RLS. The approved-access roster uses hashes rather than product email columns. Future activity, votes, photos, and scores still require explicit authorization and RLS before exposure; this block does not implement them.
 
 ## Future modules — not bootstrap deliverables
 
@@ -30,4 +30,4 @@ Privacy and security are mandatory, not optional polish. Future member data, act
 | Progress         | **Afilómetro**, achievements, and in-season statistics   |
 | Memories         | Photos/highlights, **Season Recap**, and seasons archive |
 
-Block 1 adds the editorial Season Home, countdown, season status, and temporal warmup to the verified foundation. The four module teasers are noninteractive announcements, not implemented features. Authentication, private member data, schema, games, and the modules above remain outside this deliverable.
+Block 1 adds the editorial Season Home, countdown, season status, and temporal warmup to the verified foundation. Block 2 adds private club access without redesigning that Home or changing its temporal model. The four module teasers remain noninteractive announcements, not implemented features. Games, member administration, individual activity metrics, and the modules above remain outside this deliverable.

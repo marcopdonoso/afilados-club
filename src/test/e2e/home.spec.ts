@@ -1,4 +1,36 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function openHomeFixture(page: Page) {
+  // Reuse actual production CSS/native fonts, but render only a test component.
+  // This proves UI behavior, never Google sign-in or private-route authorization.
+  await page.goto("/entrar");
+  const shell = await page.evaluate(() => ({
+    className: document.documentElement.className,
+    styles: Array.from(
+      document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
+      (link) => new URL(link.href).pathname,
+    ),
+  }));
+  await page.goto("http://127.0.0.1:3200");
+  await page.evaluate(async ({ className, styles }) => {
+    document.documentElement.className = className;
+    await Promise.all(
+      styles.map(
+        (href) =>
+          new Promise<void>((resolve, reject) => {
+            const link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.href = href;
+            link.onload = () => resolve();
+            link.onerror = () =>
+              reject(new Error("Production stylesheet failed to load"));
+            document.head.append(link);
+          }),
+      ),
+    );
+    await document.fonts.ready;
+  }, shell);
+}
 
 const viewports = [
   { name: "phone", width: 390, height: 844 },
@@ -7,7 +39,7 @@ const viewports = [
 ] as const;
 
 for (const viewport of viewports) {
-  test(`production Home is self-contained at ${viewport.name} dimensions`, async ({
+  test(`test-only member Home preserves UI at ${viewport.name} dimensions`, async ({
     page,
   }, testInfo) => {
     await page.setViewportSize({
@@ -26,9 +58,13 @@ for (const viewport of viewports) {
       }
     });
 
-    const response = await page.goto("/");
-    expect(response?.status()).toBe(200);
-    await expect(page).toHaveTitle("Afilados Club — Temporada 2026");
+    await openHomeFixture(page);
+    await expect(page).toHaveTitle("Season Home component fixture");
+    await expect(page.getByRole("banner")).toContainText("Marco");
+    await expect(page.getByRole("button", { name: "SALIR" })).toHaveAttribute(
+      "type",
+      "submit",
+    );
     await expect(page.getByRole("main")).toBeVisible();
     await expect(
       page.getByRole("heading", { level: 1, name: "AFILADOS CLUB" }),
@@ -49,10 +85,6 @@ for (const viewport of viewports) {
     await expect(
       page.getByText("EL PROGRAMA ESTÁ EN PREPARACIÓN.", { exact: true }),
     ).toBeVisible();
-    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
-      "content",
-      "La sede de una temporada entre amigos. Cochabamba, 28 de noviembre al 22 de diciembre de 2026. No es un calendario. Es una temporada.",
-    );
     await expect(page.locator('meta[name="viewport"]')).toHaveAttribute(
       "content",
       "width=device-width, initial-scale=1",
@@ -81,7 +113,7 @@ for (const viewport of viewports) {
   });
 }
 
-test("one build transitions through both phase edges after hydration", async ({
+test("test-only member Home transitions through both phase edges", async ({
   page,
 }, testInfo) => {
   const errors: string[] = [];
@@ -90,12 +122,9 @@ test("one build transitions through both phase edges after hydration", async ({
     if (message.type() === "error") errors.push(message.text());
   });
   await page.setViewportSize({ width: 390, height: 844 });
-  // Browser clock mocking deliberately leaves the request-time server clock intact.
+  // Only the fixture's browser clock is controlled; no fake auth session exists.
   await page.clock.setFixedTime(new Date("2026-11-27T23:59:59-04:00"));
-  const response = await page.goto("/");
-  expect(await response?.text()).toMatch(
-    /PRETEMPORADA|TEMPORADA ABIERTA|TEMPORADA CERRADA/,
-  );
+  await openHomeFixture(page);
   await expect(page.getByRole("status")).toHaveText("PRETEMPORADA");
   await expect(
     page
@@ -154,7 +183,7 @@ test("reduced motion disables both CSS and reactive phase animation", async ({
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.clock.setFixedTime(new Date("2026-10-30T00:00:00-04:00"));
-  await page.goto("/");
+  await openHomeFixture(page);
   await expect(page.getByRole("progressbar")).toHaveAttribute(
     "aria-valuenow",
     "50",
