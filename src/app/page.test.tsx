@@ -1,11 +1,17 @@
 // @vitest-environment jsdom
 import { act, cleanup, render, screen, within } from "@testing-library/react";
+import type { ComponentProps } from "react";
 import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 import { season } from "@/features/season/model";
 import { SeasonHome } from "@/features/season/season-home";
+
+// Isolate the season clock from Next Link's unrelated prefetch timers.
+vi.mock("next/link", () => ({
+  default: (props: ComponentProps<"a">) => <a {...props} />,
+}));
 
 const midpoint = Date.parse("2026-10-30T00:00:00-04:00");
 
@@ -46,7 +52,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test("renders semantic Home with four static announcements and temporal warmup", () => {
+test("renders semantic Home with only the Afiladero announcement linked and temporal warmup", () => {
   render(<SeasonHome initialNow={midpoint} />);
 
   expect(screen.getByRole("banner")).toBeInTheDocument();
@@ -88,7 +94,11 @@ test("renders semantic Home with four static announcements and temporal warmup",
   }
   expect(screen.queryByText("PRÓXIMAMENTE")).not.toBeInTheDocument();
   expect(screen.getByText("EL PROGRAMA ESTÁ EN PREPARACIÓN.")).toBeVisible();
-  expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /EL AFILADERO/ })).toHaveAttribute(
+    "href",
+    "/afiladero",
+  );
+  expect(within(screen.getByRole("main")).getAllByRole("link")).toHaveLength(1);
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
   expect(screen.getByRole("contentinfo")).toHaveTextContent(
     "ES UNA TEMPORADA.",

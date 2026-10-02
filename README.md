@@ -1,6 +1,6 @@
 # Afilados Club
 
-A private seasonal headquarters for friends. The Season Home now requires a verified Auth identity and active club membership; entry is Google-only at `/entrar`. See the [product brief](docs/product-brief.md).
+A private seasonal headquarters for friends. Home and **El Afiladero** (`/afiladero`) require a verified Auth identity and active club membership; entry is Google-only at `/entrar`. See the [product brief](docs/product-brief.md).
 
 ## Stack and requirements
 
@@ -21,7 +21,7 @@ Open `http://localhost:3000`. Without Supabase public configuration, private `/`
 
 ## Environment and optional local Supabase
 
-`supabase/config.toml` is configured for local development. The first migration creates `club_members` and hash-only `club_member_access`, three approved identities, own-active member RLS, a Google-only before-user-created hook, and atomic identity binding. Seeds remain disabled: approved entries are versioned in the migration. There is no automatic Auth-user creation/backfill or member management UI. No remote login/link is needed for local SQL checks.
+`supabase/config.toml` is configured for local development. The first migration creates `club_members` and hash-only `club_member_access`, three approved identities, own-active member RLS, a Google-only before-user-created hook, and atomic identity binding. The new Afiladero migration evolves SELECT to an **active roster visible only to active requesters**, without changing admission/binding. Seeds remain disabled: approved entries are versioned in the first migration; no ideas or votes are seeded. There is no automatic Auth-user creation/backfill or member management UI. No remote login/link is needed for local SQL checks.
 
 Local ports use **56320–56329** to coexist with occupied Supabase defaults: API **56321**, database **56322**, shadow database **56320**, Studio **56323**, mail UI **56324**, analytics **56327**, and edge inspector **56328**. Pooler **56329** remains disabled; optional SMTP/POP3 remain unconfigured. Check availability before starting. Local Studio is `http://127.0.0.1:56323`; the local API is `http://127.0.0.1:56321`. This port choice does not enable additional services.
 
@@ -49,7 +49,21 @@ If later authorized local work needs the clients, copy `.env.example` to ignored
 - `src/lib/supabase/route.ts`: writable request-scoped cookie view and final-response preservation for OAuth and POST logout.
 - `src/lib/auth/member.ts`: verified claims plus own-active membership query under the caller's RLS; render-pass-only React memoization. Both private layout and page enforce authorization.
 
-`/entrar` stays public; active members go to `/`, valid nonmembers stay at entry with safe errors and POST logout. OAuth endpoints use trusted origins and a fixed Home destination, not an untrusted `next` parameter. No private roster/hashes are exposed. Real Google sign-in still requires the user's browser and approved identity; mocks and component fixtures do not prove provider behavior.
+`/entrar` stays public; active members go to `/`, valid nonmembers stay at entry with safe errors and POST logout. OAuth endpoints use trusted origins and a fixed Home destination, not an untrusted `next` parameter. Roster reads require active membership; access hashes are never exposed. Real Google sign-in still requires the user's browser and approved identity; mocks and component fixtures do not prove provider behavior.
+
+## El Afiladero
+
+Home links only its Afiladero teaser to the private board. The board reads the current `season.year`, visible active members, ideas, and votes under the caller's session/RLS; failed reads show an error, never a valid empty board or fabricated zero counts.
+
+| Behavior  | Contract                                                                                                                                                                                                                                                      |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Proposals | Ten categories; trimmed title 3–80 characters; optional trimmed description up to 400 characters, blank becomes NULL. Native dialogs provide labeled forms and keyboard focus.                                                                                |
+| Ownership | Authors edit category/title/description. Authors or active admins delete, after confirmation; deleting an idea cascades its votes.                                                                                                                            |
+| Votes     | One `in` / `maybe` / `pass` vote per member/idea, including self-votes. A different choice changes it; selecting the current choice removes it.                                                                                                               |
+| Ordering  | **MÁS AFILADAS**: `in` descending, `maybe` descending, creation time descending. **NUEVAS**: creation time descending only.                                                                                                                                   |
+| Security  | Each action reuses `requireClubMember()` and a session public-key client. Private SQL definers resolve active identity/admin status without recursive roster RLS or new public RPCs. Identity/year/timestamps cannot be updated through client column grants. |
+
+Vote changes deliberately use INSERT or caller-scoped vote-only UPDATE, not upsert requiring wider immutable-column grants. Successful mutations revalidate `/afiladero`; zero affected rows and DB failures return generic Spanish errors. There is no realtime, aggregate RPC, write cutoff, pagination, member administration, or production fixture data.
 
 ## Quality and production smoke
 
@@ -63,9 +77,9 @@ pnpm test:e2e
 
 `check` runs lint, generated-route typechecking, non-watch unit tests, and formatting checks only. It does not start infrastructure or run E2E. Individual commands: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`; interactive unit runner: `pnpm test:watch`.
 
-Playwright builds production with empty public Supabase values and owns `http://127.0.0.1:3100`. It verifies anonymous private-root denial, branded entry, safe callback errors, and POST-only logout. A separate **test-only component renderer** on `127.0.0.1:3200` mounts the member Home with a fixture display name and real production CSS/native fonts to preserve viewport, temporal, and reduced-motion checks. It imports no Auth clients and is not a production route or authorization bypass. These checks are not authenticated-route or Google OAuth proof. Both servers reject existing processes and are stopped by Playwright. Chromium provisioning may require a download.
+Playwright builds production with empty public Supabase values and owns `http://127.0.0.1:3100`. It verifies anonymous private-root/Afiladero denial, branded entry, safe callback errors, and POST-only logout. A separate **test-only component renderer** on `127.0.0.1:3200` mounts Home and Afiladero fixture components with real production CSS/native fonts. It covers 390×844, 768×1024, and 1440×900, empty/populated boards, dialog viewport/focus/Escape, vote pending/errors, and reduced motion. It imports no Auth clients and is not a production route or authorization bypass. Fixture mutations affect only component state, never the database. These checks are not authenticated-route CRUD or Google OAuth proof. Both servers reject existing processes and are stopped by Playwright. Chromium provisioning may require a download.
 
-The SQL suite uses transaction-scoped fictitious identities and rolls them back. It verifies admission/binding failure, schema/constraints, roles/grants, RLS, and forbidden operations without inserting real approved Auth accounts. Search reviewed candidate/staged artifacts for real roster addresses and credentials using count-only output before delivery.
+The SQL suite uses transaction-scoped fictitious identities and rolls them back. It verifies admission/binding failure, schema/constraints, helper search paths/ACLs, narrow column grants, active roster RLS, author/admin distinctions, vote ownership/uniqueness, timestamps, and deletion cascades without inserting real approved Auth accounts. Search reviewed candidate/staged artifacts for real roster addresses and credentials using count-only output before delivery. Real member CRUD acceptance remains a human browser check after the new migration is separately authorized and applied.
 
 For a production server outside tests: `pnpm build` then `pnpm start` (loopback port 3000). Normalize before final checks; after any edits, rerun affected verification. Check staged new-file whitespace with `git diff --cached --check` when delivering.
 

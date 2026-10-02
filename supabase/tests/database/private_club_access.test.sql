@@ -105,9 +105,9 @@ do $$ begin
   perform set_config('request.jwt.claim.sub', current_setting('test.active_uid'), true);
 end $$;
 set local role authenticated;
-select is((select count(*)::integer from public.club_members), 1, 'Active member sees only own row');
-select is((select display_name from public.club_members), 'Fixture active', 'Own identity visible');
-select is((select count(*)::integer from public.club_members where display_name = 'Fixture other'), 0, 'Other identity invisible');
+select is((select count(*)::integer from public.club_members), 5, 'Active member sees the active roster');
+select is((select display_name from public.club_members where auth_user_id = current_setting('test.active_uid')::uuid), 'Fixture active', 'Caller-filtered own identity remains visible');
+select is((select count(*)::integer from public.club_members where display_name = 'Fixture other'), 1, 'Other active identity visible');
 select throws_ok('select * from public.club_member_access', '42501', null, 'Authenticated hashes query denied');
 select throws_ok($$insert into public.club_members (display_name, role) values ('Escalation', 'admin')$$, '42501', null, 'Member insertion denied');
 select throws_ok($$update public.club_members set role = 'admin'$$, '42501', null, 'Role escalation denied');

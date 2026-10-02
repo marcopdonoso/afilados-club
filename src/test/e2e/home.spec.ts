@@ -1,6 +1,15 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function openHomeFixture(page: Page) {
+  // Next normally inlines its environment flags; Vite only renders components.
+  await page.addInitScript(() => {
+    if (location.origin === "http://127.0.0.1:3200") {
+      Object.defineProperty(window, "process", {
+        value: { env: {} },
+        configurable: true,
+      });
+    }
+  });
   // Reuse actual production CSS/native fonts, but render only a test component.
   // This proves UI behavior, never Google sign-in or private-route authorization.
   await page.goto("/entrar");
@@ -59,6 +68,7 @@ for (const viewport of viewports) {
     });
 
     await openHomeFixture(page);
+    expect(errors).toEqual([]);
     await expect(page).toHaveTitle("Season Home component fixture");
     await expect(page.getByRole("banner")).toContainText("Marco");
     await expect(page.getByRole("button", { name: "SALIR" })).toHaveAttribute(
@@ -76,6 +86,10 @@ for (const viewport of viewports) {
       /^(PRETEMPORADA|TEMPORADA ABIERTA|TEMPORADA CERRADA)$/,
     );
     await expect(page.getByRole("article")).toHaveCount(4);
+    await expect(
+      page.getByRole("main").getByRole("link", { name: /EL AFILADERO/ }),
+    ).toHaveAttribute("href", "/afiladero");
+    await expect(page.getByRole("main").getByRole("link")).toHaveCount(1);
     await expect(
       page.getByRole("article").getByRole("heading", { level: 3 }),
     ).toHaveText(["EL AFILADERO", "CALENDARIO", "JUEGOS", "SEASON RECAP"]);

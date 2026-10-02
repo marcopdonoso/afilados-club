@@ -1,4 +1,7 @@
 import { CalendarDays, ChartNoAxesCombined, Dices, Shapes } from "lucide-react";
+import Link from "next/link";
+
+import { ClubHeader } from "@/components/club-header";
 
 import { season, seasonDays } from "./model";
 import { SeasonStatus } from "./season-status";
@@ -35,22 +38,7 @@ export function SeasonHome({
 }) {
   return (
     <div className="season-home">
-      <header className="club-header page-width">
-        <p className="club-wordmark">
-          AFILADOS <span>CLUB</span>
-        </p>
-        <p className="technical">{season.name.toUpperCase()}</p>
-        {member && (
-          <div className="club-identity technical">
-            <span>{member.display_name}</span>
-            <form action="/auth/logout" method="post">
-              <button className="club-logout" type="submit">
-                SALIR
-              </button>
-            </form>
-          </div>
-        )}
-      </header>
+      <ClubHeader member={member} />
 
       <main className="page-width">
         <SeasonStatus initialNow={initialNow}>
@@ -91,8 +79,21 @@ export function SeasonHome({
                     0{index + 1} /{" "}
                     <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
                   </span>
+                  {index === 0 && (
+                    <span className="teaser-enter" aria-hidden="true">
+                      ENTRAR →
+                    </span>
+                  )}
                 </div>
-                <h3>{title}</h3>
+                <h3>
+                  {index === 0 ? (
+                    <Link className="teaser-link" href="/afiladero">
+                      {title}
+                    </Link>
+                  ) : (
+                    title
+                  )}
+                </h3>
                 <p>{copy}</p>
               </article>
             ))}

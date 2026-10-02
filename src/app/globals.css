@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "../features/afiladero/board.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -95,6 +96,47 @@
 
 .club-header > .technical {
   color: var(--quiet);
+}
+
+.club-return {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.club-wordmark:focus-visible,
+.club-return:focus-visible,
+.teaser-link:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 5px;
+}
+
+.club-return:hover {
+  color: var(--orange);
+}
+
+.teaser-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.teaser:has(.teaser-link):hover,
+.teaser:has(.teaser-link:focus-visible) {
+  background: #ff8a3d08;
+}
+
+.teaser-link:hover,
+.teaser-link:focus-visible,
+.teaser-enter {
+  color: var(--orange);
+}
+
+.teaser-enter {
+  display: inline-block;
+  margin-left: 16px;
+  vertical-align: middle;
 }
 
 .club-header:has(.club-identity) {
