@@ -23,7 +23,21 @@ for (const viewport of [
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "ACCESORESTRINGIDO.",
     );
-    const google = page.getByRole("link", { name: "CONTINUAR CON GOOGLE" });
+    await expect(
+      page.getByText("SOLO PARA EL GRUPO.", { exact: true }),
+    ).toBeVisible();
+    await expect(page.locator(".entry-description")).toHaveText(
+      "Una temporada entre amigos.Una puerta bastante selectiva.",
+    );
+    await expect(page.locator(".entry-description br")).toHaveCount(1);
+    await expect(page.locator(".entry-note")).toHaveText(
+      "Sin formularios. Sin contraseñas. Sin infiltrados.",
+    );
+    const google = page.getByRole("link", {
+      name: "ENTRAR CON GOOGLE",
+      exact: true,
+    });
+    await expect(google).toBeVisible();
     await expect(google).toHaveAttribute("href", "/auth/google");
     await expect(page.getByRole("article")).toHaveCount(0);
     await expect(page.getByRole("textbox")).toHaveCount(0);
@@ -56,16 +70,28 @@ test("safe errors never reflect provider input and anonymous callback fails loca
   page,
 }) => {
   await page.goto("/entrar?error=access");
-  await expect(page.getByRole("main").getByRole("alert")).toContainText(
-    "ESA CUENTA NO ESTÁ EN LA LISTA.",
-  );
+  await expect(
+    page
+      .getByRole("main")
+      .getByRole("alert")
+      .getByRole("heading", { level: 2 }),
+  ).toHaveText("ESA CUENTA NO ESTÁ EN LA LISTA.");
+  await expect(
+    page.getByRole("main").getByRole("alert").locator("p"),
+  ).toHaveText("Buen intento. Prueba con la cuenta autorizada para el club.");
   await page.goto(
     "/auth/callback?error=access_denied&error_description=private-provider-detail",
   );
   await expect(page).toHaveURL(/\/entrar\?error=oauth$/);
-  await expect(page.getByRole("main").getByRole("alert")).toContainText(
-    "NO SE PUDO COMPLETAR EL ACCESO.",
-  );
+  await expect(
+    page
+      .getByRole("main")
+      .getByRole("alert")
+      .getByRole("heading", { level: 2 }),
+  ).toHaveText("ALGO SE TRABÓ EN LA ENTRADA.");
+  await expect(
+    page.getByRole("main").getByRole("alert").locator("p"),
+  ).toHaveText("Inténtalo otra vez. Si insiste, culpamos a la tecnología.");
   await expect(page.getByText("private-provider-detail")).toHaveCount(0);
 });
 

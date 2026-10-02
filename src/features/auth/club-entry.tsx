@@ -4,11 +4,11 @@ export type EntryError = "access" | "oauth" | "logout";
 const errors = {
   access: {
     title: "ESA CUENTA NO ESTÁ EN LA LISTA.",
-    copy: "Esta cuenta no está registrada para entrar a Afilados Club. Usa la cuenta del grupo.",
+    copy: "Buen intento. Prueba con la cuenta autorizada para el club.",
   },
   oauth: {
-    title: "NO SE PUDO COMPLETAR EL ACCESO.",
-    copy: "Vuelve a intentarlo. Si el problema continúa, avisa al grupo.",
+    title: "ALGO SE TRABÓ EN LA ENTRADA.",
+    copy: "Inténtalo otra vez. Si insiste, culpamos a la tecnología.",
   },
   logout: {
     title: "NO SE PUDO CERRAR LA SESIÓN.",
@@ -41,9 +41,9 @@ export function ClubEntry({
             RESTRINGIDO.
           </h1>
           <p className="entry-description">
-            La sede de una temporada entre amigos.
+            Una temporada entre amigos.
             <br />
-            La entrada es con la cuenta de siempre.
+            Una puerta bastante selectiva.
           </p>
           {message && (
             <div className="entry-error" role="alert">
@@ -52,12 +52,10 @@ export function ClubEntry({
             </div>
           )}
           <a className="google-entry" href="/auth/google">
-            <span aria-hidden="true">G</span>CONTINUAR CON GOOGLE
+            <span aria-hidden="true">G</span>ENTRAR CON GOOGLE
           </a>
           <p className="entry-note">
-            Sin formularios. Sin cuentas nuevas.
-            <br />
-            Solo Google y la lista del club.
+            Sin formularios. Sin contraseñas. Sin infiltrados.
           </p>
           {hasIdentity && (
             <form action="/auth/logout" method="post" className="entry-logout">

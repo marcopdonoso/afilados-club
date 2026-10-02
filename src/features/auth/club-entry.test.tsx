@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import { redirect } from "next/navigation";
 
@@ -21,22 +21,56 @@ test("entry is branded, Google-only, semantic and has no roster or registration 
     "ACCESORESTRINGIDO.",
   );
   expect(
-    screen.getByRole("link", { name: "CONTINUAR CON GOOGLE" }),
+    screen.getByText("SOLO PARA EL GRUPO.", { exact: true }),
+  ).toBeVisible();
+  const description = screen.getByText(
+    /^Una temporada entre amigos\.Una puerta bastante selectiva\.$/,
+  );
+  expect(description).toBeVisible();
+  expect(description.querySelectorAll("br")).toHaveLength(1);
+  expect(
+    screen.getByRole("link", { name: "ENTRAR CON GOOGLE" }),
   ).toHaveAttribute("href", "/auth/google");
+  expect(screen.getByRole("link", { name: "ENTRAR CON GOOGLE" })).toBeVisible();
+  expect(
+    screen.getByText("Sin formularios. Sin contraseñas. Sin infiltrados.", {
+      exact: true,
+    }),
+  ).toBeVisible();
   expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
 });
 
 test.each([
-  ["access", "ESA CUENTA NO ESTÁ EN LA LISTA."],
-  ["oauth", "NO SE PUDO COMPLETAR EL ACCESO."],
-  ["logout", "NO SE PUDO CERRAR LA SESIÓN."],
+  [
+    "access",
+    "ESA CUENTA NO ESTÁ EN LA LISTA.",
+    "Buen intento. Prueba con la cuenta autorizada para el club.",
+  ],
+  [
+    "oauth",
+    "ALGO SE TRABÓ EN LA ENTRADA.",
+    "Inténtalo otra vez. Si insiste, culpamos a la tecnología.",
+  ],
+  [
+    "logout",
+    "NO SE PUDO CERRAR LA SESIÓN.",
+    "Tu sesión puede seguir abierta. Intenta salir de nuevo.",
+  ],
 ] as const)(
   "%s errors have safe Spanish copy and a POST logout affordance",
-  (error, title) => {
+  (error, title, copy) => {
     render(<ClubEntry error={error} hasIdentity />);
-    expect(screen.getByRole("alert")).toHaveTextContent(title);
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent(title);
+    expect(
+      within(alert).getByRole("heading", {
+        level: 2,
+        name: title,
+      }),
+    ).toBeVisible();
+    expect(within(alert).getByText(copy, { exact: true })).toBeVisible();
     expect(
       screen
         .getByRole("button", { name: "SALIR DE ESTA CUENTA" })
