@@ -47,13 +47,27 @@ export async function loadAfiladero() {
         )
     : { data: [], error: null };
   if (votes.error || !votes.data) throw new Error("Board unavailable");
+  const scheduled = rows.length
+    ? await client
+        .from("season_activities")
+        .select("id,source_idea_id,start_date,status")
+        .eq("season_year", season.year)
+        .in(
+          "source_idea_id",
+          rows.map(({ id }) => id),
+        )
+    : { data: [], error: null };
+  if (scheduled.error || !scheduled.data) throw new Error("Board unavailable");
+  const schedules = new Map(
+    scheduled.data.map((activity) => [activity.source_idea_id, activity]),
+  );
   return {
     ideas: composeIdeas(
       rows,
       votes.data as VoteRow[],
       roster.data as RosterMember[],
       memberId,
-    ),
+    ).map((idea) => ({ ...idea, scheduled: schedules.get(idea.id) ?? null })),
     memberCount: roster.data.length,
     isAdmin: own.data.role === "admin",
   };

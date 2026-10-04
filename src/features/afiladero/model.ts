@@ -93,6 +93,11 @@ export type BoardIdea = IdeaRow & {
   author: string;
   counts: Record<Vote, number>;
   currentVote: Vote | null;
+  scheduled?: {
+    id: string;
+    start_date: string;
+    status: "tentative" | "confirmed" | "cancelled";
+  } | null;
 };
 
 export function composeIdeas(

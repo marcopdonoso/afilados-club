@@ -17,8 +17,14 @@ describe("the exclusive season window", () => {
     [season.startsAt - 1, "preseason", null],
     [season.startsAt, "live", 1],
     [Date.parse("2026-11-29T00:00:00-04:00"), "live", 2],
-    [Date.parse("2026-12-21T00:00:00-04:00"), "live", 24],
-    [season.endsAt - 1, "live", 24],
+    [Date.parse("2026-11-28T07:24:59-04:00"), "preseason", null],
+    [Date.parse("2026-11-28T07:25:00-04:00"), "live", 1],
+    [Date.parse("2026-12-20T07:24:59-04:00"), "live", 23],
+    [Date.parse("2026-12-20T07:25:00-04:00"), "live", 23],
+    [Date.parse("2026-12-21T00:00:00-04:00"), "live", null],
+    [Date.parse("2026-12-21T07:24:59-04:00"), "live", null],
+    [Date.parse("2026-12-21T07:25:00-04:00"), "closed", null],
+    [season.endsAt - 1, "live", null],
     [season.endsAt, "closed", null],
     [season.endsAt + 1, "closed", null],
   ] as const)("at %s returns %s and day %s", (now, phase, day) => {
@@ -27,24 +33,26 @@ describe("the exclusive season window", () => {
   });
 
   test("different offsets representing the same instant have identical results", () => {
-    const local = Date.parse("2026-12-21T23:59:59-04:00");
-    const utc = Date.parse("2026-12-22T03:59:59Z");
-    const distant = Date.parse("2026-12-22T12:59:59+09:00");
+    const local = Date.parse("2026-12-20T23:59:59-04:00");
+    const utc = Date.parse("2026-12-21T03:59:59Z");
+    const distant = Date.parse("2026-12-21T12:59:59+09:00");
     expect(local).toBe(utc);
     expect(distant).toBe(utc);
     for (const now of [local, utc, distant]) {
       expect(getPhase(now)).toBe("live");
-      expect(getSeasonDay(now)).toBe(24);
-      expect(formatSeasonDate(now)).toBe("21 DIC");
+      expect(getSeasonDay(now)).toBe(23);
+      expect(formatSeasonDate(now)).toBe("20 DIC");
     }
   });
 
   test("derives the duration and display dates in the declared zone", () => {
-    expect(seasonDays).toBe(24);
+    expect(season.startsAt).toBe(Date.parse("2026-11-28T07:25:00-04:00"));
+    expect(season.endsAt).toBe(Date.parse("2026-12-21T07:25:00-04:00"));
+    expect(seasonDays).toBe(23);
     expect(seasonDates).toEqual({
       opening: "28 NOV",
-      closing: "22 DIC",
-      lastDay: "21 DIC",
+      closing: "21 DIC",
+      lastDay: "20 DIC",
       nextYear: 2027,
     });
   });
@@ -91,6 +99,11 @@ describe("countdown arithmetic", () => {
 });
 
 describe("temporal warmup", () => {
+  test("warmup reaches 100 only at the exact opening instant", () => {
+    expect(season.warmupAt).toBe(Date.parse("2026-10-01T00:00:00-04:00"));
+    expect(getWarmupProgress(season.startsAt - 1)).toBe(99);
+    expect(getWarmupProgress(season.startsAt)).toBe(100);
+  });
   test.each([
     [season.warmupAt - 1, 0],
     [season.warmupAt, 0],

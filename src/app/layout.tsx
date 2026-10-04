@@ -14,7 +14,7 @@ const displayFont = Barlow_Condensed({
 export const metadata: Metadata = {
   title: "Afilados Club — Temporada 2026",
   description:
-    "La sede de una temporada entre amigos. Cochabamba, 28 de noviembre al 22 de diciembre de 2026. No es un calendario. Es una temporada.",
+    "La sede de una temporada entre amigos. Cochabamba, 28 de noviembre al 21 de diciembre de 2026. No es un calendario. Es una temporada.",
 };
 
 export const viewport: Viewport = {

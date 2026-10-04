@@ -71,6 +71,36 @@ test("empty board has presence and real stats, no fake ideas", () => {
   );
 });
 
+test("any active member can schedule an unlinked idea without votes; linked/cancelled replace the control", () => {
+  const calendarActions = { create: vi.fn(), edit: vi.fn(), delete: vi.fn() };
+  const view = board({
+    calendarActions,
+    member: { id: "other", display_name: "Other" },
+    ideas: [{ ...idea, counts: { in: 0, maybe: 0, pass: 0 } }],
+  });
+  expect(screen.getByRole("button", { name: "AGENDAR" })).toBeVisible();
+  view.unmount();
+  board({
+    calendarActions,
+    ideas: [
+      {
+        ...idea,
+        scheduled: {
+          id: "scheduled",
+          start_date: "2026-12-05",
+          status: "cancelled",
+        },
+      },
+    ],
+  });
+  expect(
+    screen.queryByRole("button", { name: "AGENDAR" }),
+  ).not.toBeInTheDocument();
+  expect(
+    screen.getByRole("link", { name: "EN CALENDARIO · CANCELADO" }),
+  ).toHaveAttribute("href", "/calendario#activity-scheduled");
+});
+
 test("card shows author/date/counts/current vote; only own edits and author/admin deletion", () => {
   const view = board();
   const card = screen.getByRole("article");

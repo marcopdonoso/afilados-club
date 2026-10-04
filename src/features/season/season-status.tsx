@@ -12,6 +12,7 @@ import {
   getWarmupProgress,
   phaseLabels,
   season,
+  seasonBounds,
   seasonDates,
   seasonDays,
 } from "./model";
@@ -34,6 +35,7 @@ export function SeasonStatus({
   const phase = getPhase(now);
   const countdown = getCountdown(now, season.startsAt);
   const progress = getWarmupProgress(now);
+  const day = getSeasonDay(now);
   const reduceMotion = useReducedMotion();
 
   return (
@@ -98,10 +100,18 @@ export function SeasonStatus({
                   SE DECLARA OFICIALMENTE INAUGURADA.
                 </p>
                 <p className="phase-headline">
-                  DÍA <span>{getSeasonDay(now)}</span> DE {seasonDays}
+                  {day === null ? (
+                    "DÍA DE SALIDA"
+                  ) : (
+                    <>
+                      DÍA <span>{day}</span> DE {seasonDays}
+                    </>
+                  )}
                 </p>
                 <p className="readout-note">
-                  El tiempo es limitado. Las excusas también.
+                  {day === null
+                    ? `La expedición se retira a las ${seasonBounds.closingTime}.`
+                    : "El tiempo es limitado. Las excusas también."}
                 </p>
               </>
             ) : (
@@ -128,14 +138,14 @@ export function SeasonStatus({
           <dt className="technical">APERTURA</dt>
           <dd>
             {seasonDates.opening}
-            <small>00:00</small>
+            <small>{seasonBounds.openingTime}</small>
           </dd>
         </div>
         <div>
           <dt className="technical">CIERRE</dt>
           <dd>
             {seasonDates.closing}
-            <small>00:00</small>
+            <small>{seasonBounds.closingTime}</small>
           </dd>
         </div>
         <div>

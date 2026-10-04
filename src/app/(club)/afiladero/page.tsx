@@ -4,6 +4,11 @@ import { ClubHeader } from "@/components/club-header";
 import { AfiladeroBoard } from "@/features/afiladero/board";
 import { loadAfiladero } from "@/features/afiladero/load";
 import { requireClubMember } from "@/lib/auth/member";
+import {
+  createActivity,
+  editActivity,
+  deleteActivity,
+} from "../calendario/actions";
 
 import {
   createIdea,
@@ -44,6 +49,11 @@ export default async function AfiladeroPage({
       {...board}
       member={member}
       order={order}
+      calendarActions={{
+        create: createActivity,
+        edit: editActivity,
+        delete: deleteActivity,
+      }}
       actions={{
         create: createIdea,
         edit: editIdea,

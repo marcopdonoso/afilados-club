@@ -3,6 +3,8 @@ import { ArrowUpRight, Shapes } from "lucide-react";
 
 import { ClubHeader } from "@/components/club-header";
 import { formatSeasonDate, season } from "@/features/season/model";
+import { PromotionControl } from "@/features/calendario/promotion-control";
+import type { CalendarActions } from "@/features/calendario/model";
 
 import {
   categories,
@@ -23,6 +25,7 @@ export function AfiladeroBoard({
   memberCount,
   order,
   actions,
+  calendarActions,
 }: {
   ideas: BoardIdea[];
   member: RosterMember;
@@ -30,6 +33,7 @@ export function AfiladeroBoard({
   memberCount: number;
   order: IdeaOrder;
   actions: BoardActions;
+  calendarActions?: CalendarActions;
 }) {
   const totalVotes = ideas.reduce(
     (total, { counts }) => total + counts.in + counts.maybe + counts.pass,
@@ -136,6 +140,9 @@ export function AfiladeroBoard({
                       </time>
                     </p>
                     <VoteControls idea={idea} actions={actions} />
+                    {calendarActions && (
+                      <PromotionControl idea={idea} actions={calendarActions} />
+                    )}
                     {(own || isAdmin) && (
                       <div className="idea-management">
                         {own && (

@@ -103,7 +103,10 @@ export async function deleteIdea(input: unknown): Promise<ActionResult> {
       .eq("id", parsed.data)
       .eq("season_year", season.year)
       .select("id");
-    return error || data?.length !== 1 ? failure(errors.delete) : success();
+    if (error || data?.length !== 1) return failure(errors.delete);
+    revalidatePath("/calendario");
+    revalidatePath("/");
+    return success();
   } catch {
     return failure(errors.delete);
   }

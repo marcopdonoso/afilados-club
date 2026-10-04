@@ -79,15 +79,18 @@ export function SeasonHome({
                     0{index + 1} /{" "}
                     <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
                   </span>
-                  {index === 0 && (
+                  {index <= 1 && (
                     <span className="teaser-enter" aria-hidden="true">
                       ENTRAR →
                     </span>
                   )}
                 </div>
                 <h3>
-                  {index === 0 ? (
-                    <Link className="teaser-link" href="/afiladero">
+                  {index <= 1 ? (
+                    <Link
+                      className="teaser-link"
+                      href={index === 0 ? "/afiladero" : "/calendario"}
+                    >
                       {title}
                     </Link>
                   ) : (
