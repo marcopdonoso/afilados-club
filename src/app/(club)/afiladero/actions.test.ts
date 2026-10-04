@@ -137,6 +137,8 @@ test("author can delete and active admin can delete but ordinary non-author cann
   query({ id: ideaId, proposed_by: memberId });
   const own = query([{ id: ideaId }]);
   expect(await deleteIdea(ideaId)).toEqual({ ok: true });
+  expect(revalidatePath).toHaveBeenCalledWith("/calendario");
+  expect(revalidatePath).toHaveBeenCalledWith("/");
   expect(own.eq).toHaveBeenCalledWith("season_year", season.year);
   from.mockClear();
   query({ id: ideaId, proposed_by: "other" });

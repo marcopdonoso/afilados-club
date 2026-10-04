@@ -12,8 +12,8 @@ export const season = {
   year: 2026,
   timeZone: "America/La_Paz",
   warmupAt: Date.parse("2026-10-01T00:00:00-04:00"),
-  startsAt: Date.parse("2026-11-28T00:00:00-04:00"),
-  endsAt: Date.parse("2026-12-22T00:00:00-04:00"),
+  startsAt: Date.parse("2026-11-28T07:25:00-04:00"),
+  endsAt: Date.parse("2026-12-21T07:25:00-04:00"),
 } as const satisfies Season;
 
 const SECOND = 1_000;
@@ -40,9 +40,14 @@ export function getPhase(now: number): SeasonPhase {
 }
 
 export function getSeasonDay(now: number): number | null {
-  return getPhase(now) === "live"
-    ? Math.floor((now - season.startsAt) / DAY) + 1
-    : null;
+  if (getPhase(now) !== "live") return null;
+  const date = getSeasonISODate(now);
+  if (date > seasonBounds.lastPlanDate) return null;
+  return (
+    Math.round(
+      (Date.parse(date) - Date.parse(seasonBounds.firstPlanDate)) / DAY,
+    ) + 1
+  );
 }
 
 export function getCountdown(now: number, target: number): Countdown {
@@ -58,7 +63,9 @@ export function getCountdown(now: number, target: number): Countdown {
 export function getWarmupProgress(now: number): number {
   // Temporal preparation progress only: this is not member activity or readiness.
   const elapsed = (now - season.warmupAt) / (season.startsAt - season.warmupAt);
-  return Math.round(Math.min(1, Math.max(0, elapsed)) * 100);
+  return now >= season.startsAt
+    ? 100
+    : Math.min(99, Math.round(Math.max(0, elapsed) * 100));
 }
 
 export function getWarmupCopy(progress: number): string {
@@ -82,6 +89,34 @@ export function formatSeasonDate(timestamp: number): string {
   const month = parts.find((part) => part.type === "month")?.value;
   return `${day} ${month?.replace(".", "").toUpperCase()}`;
 }
+
+const isoFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: season.timeZone,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+export function getSeasonISODate(timestamp: number): string {
+  const parts = isoFormatter.formatToParts(timestamp);
+  return ["year", "month", "day"]
+    .map((type) => parts.find((part) => part.type === type)!.value)
+    .join("-");
+}
+export function formatSeasonTime(timestamp: number): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: season.timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(timestamp);
+}
+export const seasonBounds = {
+  firstPlanDate: getSeasonISODate(season.startsAt),
+  lastPlanDate: getSeasonISODate(season.endsAt - DAY),
+  departureDate: getSeasonISODate(season.endsAt),
+  openingTime: formatSeasonTime(season.startsAt),
+  closingTime: formatSeasonTime(season.endsAt),
+};
 
 export const seasonDates = {
   opening: formatSeasonDate(season.startsAt),

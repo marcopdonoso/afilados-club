@@ -1,6 +1,6 @@
 # Afilados Club
 
-A private seasonal headquarters for friends. Home and **El Afiladero** (`/afiladero`) require a verified Auth identity and active club membership; entry is Google-only at `/entrar`. See the [product brief](docs/product-brief.md).
+A private seasonal headquarters for friends. Home, **El Afiladero** (`/afiladero`) and **Calendar** (`/calendario`) require a verified Auth identity and active club membership; entry is Google-only at `/entrar`. See the [product brief](docs/product-brief.md).
 
 ## Stack and requirements
 
@@ -53,7 +53,7 @@ If later authorized local work needs the clients, copy `.env.example` to ignored
 
 ## El Afiladero
 
-Home links only its Afiladero teaser to the private board. The board reads the current `season.year`, visible active members, ideas, and votes under the caller's session/RLS; failed reads show an error, never a valid empty board or fabricated zero counts.
+Home links its Afiladero and Calendar teasers. The board reads the current `season.year`, active roster, ideas, votes and scheduling badges under the caller's session/RLS; failed reads show an error, never a valid empty board or fabricated zero counts.
 
 | Behavior  | Contract                                                                                                                                                                                                                                                      |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -64,6 +64,18 @@ Home links only its Afiladero teaser to the private board. The board reads the c
 | Security  | Each action reuses `requireClubMember()` and a session public-key client. Private SQL definers resolve active identity/admin status without recursive roster RLS or new public RPCs. Identity/year/timestamps cannot be updated through client column grants. |
 
 Vote changes deliberately use INSERT or caller-scoped vote-only UPDATE, not upsert requiring wider immutable-column grants. Successful mutations revalidate `/afiladero`; zero affected rows and DB failures return generic Spanish errors. There is no realtime, aggregate RPC, write cutoff, pagination, member administration, or production fixture data.
+
+## Season calendar
+
+The single temporal source is `src/features/season/model.ts`: **November 28, 2026 at 07:25 → December 21 at 07:25 exclusive**, `America/La_Paz`, exactly **23 days**. Planning dates are November 28–December 20. Home numbers La Paz calendar dates; December 21 remains live before closing but shows departure copy, never Day 24. Warmup runs from October 1 midnight and reaches 100% at the exact opening.
+
+`/calendario` shows all 23 dates even when empty: seven chronological desktop columns starting Saturday, a readable tablet grid, and a vertical mobile agenda. Metrics count noncancelled activities, confirmed activities and dates without a noncancelled covering activity. Multi-day entries cover every plan date but never add a departure cell. Within each date, timed entries sort first by start time, then all-day entries; creation time ascending and ID break ties. Cancelled entries remain visible with explicit status and struck titles but do not occupy dates.
+
+One native-dialog form serves direct/day creation, idea promotion and creator/admin edits. Start date is required; end date defaults to start. Time is optional; same-day end must be later than start, while overnight ranges may end earlier. A December 21 end requires both times and must finish by 07:25, never all-day. Creation allows tentative/confirmed only; editing can cancel or reinstate.
+
+Any active member can **AGENDAR** an unlinked idea, without vote thresholds. Title/category/description are independent editable snapshots. A unique, immutable source link prevents duplicate promotion, including cancellation. Deleting an activity frees the idea; deleting an idea clears only the link and keeps the activity snapshot. Creator/admin deletion requires confirmation and should be reserved for erroneous entries, not abandoned plans. Calendar mutations and idea deletion revalidate `/calendario`, `/afiladero` and Home.
+
+The new migration defaults member/year/ID/timestamps in the database, grants only actual input/read columns, and independently enforces active-member RLS plus creator/admin mutation authority. A private, non-callable trigger checks same-season source provenance. No Auth, admission, votes, applied migrations or real-data backfills change.
 
 ## Quality and production smoke
 
@@ -77,9 +89,9 @@ pnpm test:e2e
 
 `check` runs lint, generated-route typechecking, non-watch unit tests, and formatting checks only. It does not start infrastructure or run E2E. Individual commands: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`; interactive unit runner: `pnpm test:watch`.
 
-Playwright builds production with empty public Supabase values and owns `http://127.0.0.1:3100`. It verifies anonymous private-root/Afiladero denial, branded entry, safe callback errors, and POST-only logout. A separate **test-only component renderer** on `127.0.0.1:3200` mounts Home and Afiladero fixture components with real production CSS/native fonts. It covers 390×844, 768×1024, and 1440×900, empty/populated boards, dialog viewport/focus/Escape, vote pending/errors, and reduced motion. It imports no Auth clients and is not a production route or authorization bypass. Fixture mutations affect only component state, never the database. These checks are not authenticated-route CRUD or Google OAuth proof. Both servers reject existing processes and are stopped by Playwright. Chromium provisioning may require a download.
+Playwright builds production with empty public Supabase values and owns `http://127.0.0.1:3100`. It verifies anonymous private-root/Afiladero/Calendar denial, branded entry, safe callback errors, and POST-only logout. A separate **test-only component renderer** on `127.0.0.1:3200` mounts Home, Afiladero and Calendar fixtures with real production CSS/native fonts. It covers 390×844, 768×1024, and 1440×900, all 23 dates, empty/populated boards, day/date controls, dialog viewport/focus/Escape, pending/errors, cancellation/reinstatement, idea snapshot promotion, and reduced motion. It imports no Auth clients and is not a production route or authorization bypass. Fixture mutations affect only component state, never the database. These checks are not authenticated-route CRUD or Google OAuth proof. Both servers reject existing processes and are stopped by Playwright. Chromium provisioning may require a download.
 
-The SQL suite uses transaction-scoped fictitious identities and rolls them back. It verifies admission/binding failure, schema/constraints, helper search paths/ACLs, narrow column grants, active roster RLS, author/admin distinctions, vote ownership/uniqueness, timestamps, and deletion cascades without inserting real approved Auth accounts. Search reviewed candidate/staged artifacts for real roster addresses and credentials using count-only output before delivery. Real member CRUD acceptance remains a human browser check after the new migration is separately authorized and applied.
+The SQL suite uses transaction-scoped fictitious identities and rolls them back. It verifies admission/binding, schema/constraints, helper ACLs, narrow grants, active-member RLS, creator/admin distinctions, vote ownership, date/time/departure limits, source uniqueness/same-season provenance, snapshot independence and deletion semantics without inserting real approved Auth accounts. Run it after a fresh disposable local reset with no seeds; never substitute a remote project. Real member CRUD acceptance remains a human browser check after the new migration is separately authorized and applied.
 
 For a production server outside tests: `pnpm build` then `pnpm start` (loopback port 3000). Normalize before final checks; after any edits, rerun affected verification. Check staged new-file whitespace with `git diff --cached --check` when delivering.
 

@@ -3,7 +3,7 @@
 ## Product
 
 - A private project for a known group of friends, organized in reusable annual seasons.
-- Season 2026 runs November 28–December 22. Preserve the premise in `docs/product-brief.md`.
+- Season 2026 runs November 28 at 07:25–December 21 at 07:25 (exclusive), in America/La_Paz: 23 days; December 21 is departure-only. Preserve the premise in `docs/product-brief.md`.
 - Make it fun and distinctive, not corporate. WhatsApp remains the main chat; this is the season headquarters.
 - Foundation work does not authorize product features, authentication flows, or database schema.
 

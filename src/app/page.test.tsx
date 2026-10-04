@@ -52,7 +52,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test("renders semantic Home with only the Afiladero announcement linked and temporal warmup", () => {
+test("renders semantic Home with only Afiladero and Calendar linked and temporal warmup", () => {
   render(<SeasonHome initialNow={midpoint} />);
 
   expect(screen.getByRole("banner")).toBeInTheDocument();
@@ -70,10 +70,10 @@ test("renders semantic Home with only the Afiladero announcement linked and temp
   ).toEqual(["ESTADO", "APERTURA", "CIERRE", "VENTANA"]);
   expect(
     within(board).getByText("APERTURA").nextElementSibling,
-  ).toHaveTextContent(/^28 NOV00:00$/);
+  ).toHaveTextContent(/^28 NOV07:25$/);
   expect(
     within(board).getByText("CIERRE").nextElementSibling,
-  ).toHaveTextContent(/^22 DIC00:00$/);
+  ).toHaveTextContent(/^21 DIC07:25$/);
   expect(
     screen.getByRole("progressbar", { name: "NIVEL DE AFILADO" }),
   ).toHaveAttribute("aria-valuenow", "50");
@@ -98,7 +98,11 @@ test("renders semantic Home with only the Afiladero announcement linked and temp
     "href",
     "/afiladero",
   );
-  expect(within(screen.getByRole("main")).getAllByRole("link")).toHaveLength(1);
+  expect(screen.getByRole("link", { name: "CALENDARIO" })).toHaveAttribute(
+    "href",
+    "/calendario",
+  );
+  expect(within(screen.getByRole("main")).getAllByRole("link")).toHaveLength(2);
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
   expect(screen.getByRole("contentinfo")).toHaveTextContent(
     "ES UNA TEMPORADA.",
@@ -119,14 +123,14 @@ test("ticks from actual absolute time and cleans up its only interval", () => {
     vi.setSystemTime(midpoint + 3_600_000);
     vi.advanceTimersByTime(1_000);
   });
-  expect(countdown?.querySelectorAll("dd")[1]).toHaveTextContent("22");
+  expect(countdown?.querySelectorAll("dd")[1]).toHaveTextContent("06");
   expect(countdown?.querySelectorAll("dd")[3]).toHaveTextContent("59");
   view.unmount();
   expect(vi.getTimerCount()).toBe(0);
 });
 
 test.each([
-  [season.startsAt, "TEMPORADA ABIERTA", "DÍA 1 DE 24"],
+  [season.startsAt, "TEMPORADA ABIERTA", "DÍA 1 DE 23"],
   [season.endsAt, "TEMPORADA CERRADA", "NOS VEMOS EN 2027"],
 ] as const)(
   "automatically crosses boundary %s without a reload",
@@ -151,6 +155,17 @@ test.each([
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
   },
 );
+
+test("departure remains live without rendering a nonexistent Day 24", () => {
+  const now = Date.parse("2026-12-21T07:24:59-04:00");
+  vi.setSystemTime(now);
+  render(<SeasonHome initialNow={now} />);
+  expect(screen.getByRole("status")).toHaveTextContent("TEMPORADA ABIERTA");
+  expect(screen.getByText("DÍA DE SALIDA")).toBeVisible();
+  expect(document.querySelector(".phase-headline")).not.toHaveTextContent(
+    /DÍA 24|DÍA DE 23/,
+  );
+});
 
 test("each Home instance has an independent clock lifetime", () => {
   const first = render(<SeasonHome initialNow={midpoint} />);

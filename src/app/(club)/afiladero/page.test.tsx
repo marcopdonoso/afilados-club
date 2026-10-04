@@ -96,12 +96,24 @@ test("votes are restricted to loaded idea IDs and composed into real stats", asy
   ]);
   query({ role: "member" });
   const votes = query([{ idea_id: id, member_id: memberId, vote: "in" }]);
+  const scheduled = query([
+    {
+      id: "scheduled",
+      source_idea_id: id,
+      start_date: "2026-12-05",
+      status: "confirmed",
+    },
+  ]);
   render(
     await AfiladeroPage({
       searchParams: Promise.resolve({ order: "invalid" }),
     }),
   );
   expect(votes.in).toHaveBeenCalledWith("idea_id", [id]);
+  expect(scheduled.in).toHaveBeenCalledWith("source_idea_id", [id]);
+  expect(
+    screen.getByRole("link", { name: "EN CALENDARIO · 5 DIC" }),
+  ).toHaveAttribute("href", "/calendario#activity-scheduled");
   expect(screen.getByLabelText("Datos del Afiladero")).toHaveTextContent(
     "IDEAS1VOTOS1MIEMBROS2",
   );
@@ -111,11 +123,11 @@ test("votes are restricted to loaded idea IDs and composed into real stats", asy
   );
 });
 
-test.each(["ideas", "roster", "role", "votes"])(
+test.each(["ideas", "roster", "role", "votes", "scheduled"])(
   "%s load failure is not an empty board or fake zero stats",
   async (failed) => {
     query(
-      failed === "votes" ? [{ id: "idea" }] : [],
+      failed === "votes" || failed === "scheduled" ? [{ id: "idea" }] : [],
       failed === "ideas" ? { message: "private" } : null,
     );
     query([], failed === "roster" ? { message: "private" } : null);
@@ -124,6 +136,10 @@ test.each(["ideas", "roster", "role", "votes"])(
       failed === "role" ? { message: "private" } : null,
     );
     if (failed === "votes") query(null, { message: "private" });
+    if (failed === "scheduled") {
+      query([]);
+      query(null, { message: "private" });
+    }
     render(await AfiladeroPage({ searchParams: Promise.resolve({}) }));
     expect(screen.getByRole("alert")).toHaveTextContent(
       "NO SE PUDO ABRIR EL AFILADERO",
